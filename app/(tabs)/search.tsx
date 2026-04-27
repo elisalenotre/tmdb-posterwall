@@ -1,9 +1,17 @@
 import { Image } from "expo-image";
 import { router } from "expo-router";
-import React, { useCallback } from "react";
-import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
+import React, { useCallback, useState } from "react";
+import {
+  FlatList,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 
-import { useDiscoverMovies } from "@/src/tmdb/hooks/useDiscoverMovies";
+import { useDebouncedValue } from "@/src/core/utils/debounce";
+import { useSearchMovies } from "@/src/tmdb/hooks/useSearchMovies";
 import { tmdbPosterUrl } from "@/src/tmdb/tmdb.images";
 
 import { useFavorites } from "@/src/providers/FavoritesProvider";
@@ -11,9 +19,12 @@ import { useFavorites } from "@/src/providers/FavoritesProvider";
 const NUM_COLUMNS = 3;
 const GAP = 8;
 
-export default function HomeScreen() {
+export default function SearchScreen() {
+  const [query, setQuery] = useState("");
+  const debouncedQuery = useDebouncedValue(query, 450);
+
   const { items, isLoading, isLoadingMore, error, loadNextPage, refresh } =
-    useDiscoverMovies();
+    useSearchMovies(debouncedQuery);
 
   const { toggleFavorite, isFavorite } = useFavorites();
 
@@ -23,7 +34,14 @@ export default function HomeScreen() {
 
   return (
     <View style={styles.screen}>
-      <Text style={styles.title}>Discover</Text>
+      <TextInput
+        value={query}
+        onChangeText={setQuery}
+        placeholder="Rechercher un film…"
+        autoCorrect={false}
+        autoCapitalize="none"
+        style={styles.input}
+      />
 
       {error ? <Text style={styles.error}>{error}</Text> : null}
 
@@ -39,7 +57,6 @@ export default function HomeScreen() {
         onEndReachedThreshold={0.6}
         renderItem={({ item }) => {
           const poster = tmdbPosterUrl(item.poster_path, "w342");
-          const isFav = isFavorite(item.id);
 
           return (
             <Pressable
@@ -70,13 +87,27 @@ export default function HomeScreen() {
                     poster_path: item.poster_path,
                   })
                 }
-                style={[styles.heart, isFav && styles.heartActive]}
+                style={[
+                  styles.heart,
+                  isFavorite(item.id) && styles.heartActive,
+                ]}
               >
-                <Text style={styles.heartText}>{isFav ? "♥" : "♡"}</Text>
+                <Text style={styles.heartText}>
+                  {isFavorite(item.id) ? "♥" : "♡"}
+                </Text>
               </Pressable>
             </Pressable>
           );
         }}
+        ListEmptyComponent={
+          debouncedQuery.trim().length > 0 && !isLoading ? (
+            <Text style={styles.empty}>Aucun résultat.</Text>
+          ) : (
+            <Text style={styles.empty}>
+              Tape un titre de film pour lancer la recherche.
+            </Text>
+          )
+        }
         ListFooterComponent={
           isLoadingMore ? (
             <Text style={styles.footer}>Loading more…</Text>
@@ -89,7 +120,14 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
   screen: { flex: 1, paddingHorizontal: 12, paddingTop: 12 },
-  title: { fontSize: 22, fontWeight: "700", marginBottom: 12 },
+  input: {
+    height: 44,
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    backgroundColor: "#dddddd",
+    color: "black",
+    marginBottom: 12,
+  },
   error: { color: "crimson", marginBottom: 8 },
   listContent: { paddingBottom: 24 },
   row: { gap: GAP, marginBottom: GAP },
@@ -97,13 +135,19 @@ const styles = StyleSheet.create({
   poster: {
     aspectRatio: 2 / 3,
     borderRadius: 10,
-    backgroundColor: "#222",
+    backgroundColor: "#cdcdcd",
     overflow: "hidden",
     alignItems: "center",
     justifyContent: "center",
   },
   posterFallback: { color: "#aaa", fontWeight: "700" },
-  movieTitle: { marginTop: 6, fontSize: 12 },
+  movieTitle: { marginTop: 6, fontSize: 12, color: "black" },
+  empty: {
+    textAlign: "center",
+    paddingVertical: 24,
+    opacity: 0.7,
+    color: "black",
+  },
   heart: {
     position: "absolute",
     top: 8,
@@ -121,5 +165,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "700",
   },
-  footer: { textAlign: "center", paddingVertical: 16, opacity: 0.7 },
+  footer: {
+    textAlign: "center",
+    paddingVertical: 16,
+    opacity: 0.7,
+    color: "black",
+  },
 });
