@@ -1,4 +1,4 @@
-import { ENV } from "@/src/core/config/env";
+import { ENV } from "@/src/core/config/.env";
 
 type QueryParams = Record<string, string | number | boolean | undefined | null>;
 
