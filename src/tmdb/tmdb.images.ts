@@ -1,4 +1,4 @@
-import { ENV } from "@/src/core/config/env";
+import { ENV } from "@/src/core/config/.env";
 
 export function tmdbPosterUrl(
   posterPath: string | null,
