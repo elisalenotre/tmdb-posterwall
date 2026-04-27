@@ -6,12 +6,16 @@ import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
 import { useDiscoverMovies } from "@/src/tmdb/hooks/useDiscoverMovies";
 import { tmdbPosterUrl } from "@/src/tmdb/tmdb.images";
 
+import { useFavorites } from "@/src/providers/FavoritesProvider";
+
 const NUM_COLUMNS = 3;
 const GAP = 8;
 
 export default function HomeScreen() {
   const { items, isLoading, isLoadingMore, error, loadNextPage, refresh } =
     useDiscoverMovies();
+
+  const { toggleFavorite, isFavorite } = useFavorites();
 
   const onEndReached = useCallback(() => {
     loadNextPage();
@@ -35,6 +39,7 @@ export default function HomeScreen() {
         onEndReachedThreshold={0.6}
         renderItem={({ item }) => {
           const poster = tmdbPosterUrl(item.poster_path, "w342");
+          const isFav = isFavorite(item.id);
 
           return (
             <Pressable
@@ -57,6 +62,18 @@ export default function HomeScreen() {
               <Text numberOfLines={2} style={styles.movieTitle}>
                 {item.title}
               </Text>
+              <Pressable
+                onPress={() =>
+                  toggleFavorite({
+                    id: item.id,
+                    title: item.title,
+                    poster_path: item.poster_path,
+                  })
+                }
+                style={[styles.heart, isFav && styles.heartActive]}
+              >
+                <Text style={styles.heartText}>{isFav ? "♥" : "♡"}</Text>
+              </Pressable>
             </Pressable>
           );
         }}
@@ -87,5 +104,22 @@ const styles = StyleSheet.create({
   },
   posterFallback: { color: "#aaa", fontWeight: "700" },
   movieTitle: { marginTop: 6, fontSize: 12 },
+  heart: {
+    position: "absolute",
+    top: 8,
+    right: 8,
+    backgroundColor: "rgba(0,0,0,0.6)",
+    borderRadius: 14,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+  },
+  heartActive: {
+    backgroundColor: "rgba(220,20,60,0.8)",
+  },
+  heartText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "700",
+  },
   footer: { textAlign: "center", paddingVertical: 16, opacity: 0.7 },
 });
