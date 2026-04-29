@@ -7,3 +7,11 @@ export function tmdbPosterUrl(
   if (!posterPath) return null;
   return `${ENV.TMDB_IMAGE_BASE_URL}/${size}${posterPath}`;
 }
+
+export function tmdbBackdropUrl(
+  backdropPath: string | null,
+  size: "w780" | "w1280" = "w780",
+) {
+  if (!backdropPath) return null;
+  return `${ENV.TMDB_IMAGE_BASE_URL}/${size}${backdropPath}`;
+}
