@@ -80,6 +80,7 @@ export default function MovieDetailsScreen() {
           end={{ x: 0, y: 1 }}
           style={StyleSheet.absoluteFillObject}
         />
+        <View style={styles.backdropBottomPatch} />
       </View>
 
       {/* Header row poster + title */}
@@ -153,6 +154,15 @@ const styles = StyleSheet.create({
   error: { color: "crimson" },
 
   backdrop: { height: 220, backgroundColor: "white" },
+
+  backdropBottomPatch: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    bottom: -1,
+    height: 2,
+    backgroundColor: "#fff",
+  },
 
   headerRow: {
     flexDirection: "row",
