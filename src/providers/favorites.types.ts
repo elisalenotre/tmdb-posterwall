@@ -10,4 +10,5 @@ export type FavoritesState = {
 
 export type FavoritesAction =
   | { type: "TOGGLE_FAVORITE"; movie: FavoriteMovie }
-  | { type: "CLEAR_FAVORITES" };
+  | { type: "CLEAR_FAVORITES" }
+  | { type: "HYDRATE"; state: FavoritesState };

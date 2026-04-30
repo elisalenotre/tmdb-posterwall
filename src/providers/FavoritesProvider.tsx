@@ -1,12 +1,22 @@
 import {
-    favoritesReducer,
-    initialFavoritesState,
+  favoritesReducer,
+  initialFavoritesState,
 } from "@/src/providers/favorites.reducer";
+import {
+  loadFavoritesState,
+  saveFavoritesState,
+} from "@/src/providers/favorites.storage";
 import type {
-    FavoriteMovie,
-    FavoritesState,
+  FavoriteMovie,
+  FavoritesState,
 } from "@/src/providers/favorites.types";
-import React, { createContext, useContext, useMemo, useReducer } from "react";
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useReducer,
+} from "react";
 
 type FavoritesContextValue = {
   state: FavoritesState;
@@ -18,6 +28,25 @@ const FavoritesContext = createContext<FavoritesContextValue | null>(null);
 
 export function FavoritesProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(favoritesReducer, initialFavoritesState);
+
+  useEffect(() => {
+    let mounted = true;
+
+    loadFavoritesState().then((stored) => {
+      if (!mounted) return;
+      if (stored) {
+        dispatch({ type: "HYDRATE", state: stored });
+      }
+    });
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    saveFavoritesState(state);
+  }, [state]);
 
   const value = useMemo<FavoritesContextValue>(() => {
     return {

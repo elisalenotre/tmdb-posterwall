@@ -1,6 +1,6 @@
 import type {
-    FavoritesAction,
-    FavoritesState,
+  FavoritesAction,
+  FavoritesState,
 } from "@/src/providers/favorites.types";
 
 export const initialFavoritesState: FavoritesState = {
@@ -29,6 +29,9 @@ export function favoritesReducer(
 
     case "CLEAR_FAVORITES":
       return initialFavoritesState;
+
+    case "HYDRATE":
+      return action.state;
 
     default:
       return state;
