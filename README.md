@@ -5,8 +5,6 @@ Projet mobile réalisé avec **Expo** + **React Native** (TypeScript) utilisant 
 > TMDB = The Movie Database  
 > Ce projet est un exercice.
 
----
-
 ## Fonctionnalités
 
 - **Home / Discover**
@@ -24,8 +22,6 @@ Projet mobile réalisé avec **Expo** + **React Native** (TypeScript) utilisant 
   - Interaction type “like” sur la card avec un double tap (gesture-handler)
   - Animation du cœur via Reanimated (shared values + animated styles)
 
----
-
 ## Stack technique
 
 - **Expo Router** (multi-screens, layouts, routes dynamiques)
@@ -37,8 +33,6 @@ Projet mobile réalisé avec **Expo** + **React Native** (TypeScript) utilisant 
 - **react-native-reanimated**
 - **expo-image** (affichage posters)
 - **expo-linear-gradient** (fondu sur le backdrop en page détail)
-
----
 
 ## Installation & lancement
 
@@ -56,8 +50,6 @@ Projet mobile réalisé avec **Expo** + **React Native** (TypeScript) utilisant 
 
 `npx expo start`
 
----
-
 ## Configuration TMDB (token)
 
 Le token TMDB est lu depuis :
@@ -72,8 +64,6 @@ Exemple :
 `TMDB_TOKEN: "YOUR_TMDB_READ_ACCESS_TOKEN",`
 `} as const;`
 
----
-
 ## Architecture (dossiers)
 
 - `app/` : routes Expo Router (écrans)
@@ -86,9 +76,7 @@ Exemple :
   - `src/tmdb/` : types, api calls, hooks
   - `src/providers/` : store global (favorites) + persistence
 
----
-
-## Crédit
+## Crédits
 
 - Données : [TMDB API](https://developer.themoviedb.org/reference/intro/getting-started)
 - Les images/posters appartiennent à leurs ayants droit (usage éducatif).
