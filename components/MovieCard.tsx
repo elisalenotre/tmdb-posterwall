@@ -3,14 +3,15 @@ import React, { useMemo } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
+  cancelAnimation,
   interpolate,
-  runOnJS,
   useAnimatedStyle,
   useSharedValue,
   withSequence,
   withSpring,
   withTiming,
 } from "react-native-reanimated";
+import { scheduleOnRN } from "react-native-worklets";
 
 type MovieCardProps = {
   title: string;
@@ -30,9 +31,16 @@ export function MovieCard({
   const heartProgress = useSharedValue(0);
 
   const animateHeart = () => {
+    // éviter d’interrompre l’animation en cours, ça ferait un effet de “freeze” pas joli
+    cancelAnimation(heartProgress);
+    heartProgress.value = 0;
+
     heartProgress.value = withSequence(
       withTiming(1, { duration: 120 }),
-      withSpring(0, { damping: 10, stiffness: 140 }),
+      // soit fade-out propre :
+      withTiming(0, { duration: 220 }),
+      // soit un petit spring retour (optionnel) :
+      withSpring(0, { damping: 14, stiffness: 180 }),
     );
   };
 
@@ -41,7 +49,7 @@ export function MovieCard({
       .numberOfTaps(2)
       .maxDelay(250)
       .onEnd(() => {
-        runOnJS(onToggleFavorite)();
+        scheduleOnRN(onToggleFavorite);
         animateHeart();
       });
   }, [onToggleFavorite]);
@@ -51,10 +59,11 @@ export function MovieCard({
       .numberOfTaps(1)
       .maxDelay(250)
       .onEnd(() => {
-        runOnJS(onOpen)();
+        scheduleOnRN(onOpen);
       });
   }, [onOpen]);
 
+  // double tap prioritaire sur single tap
   const composed = useMemo(() => {
     return Gesture.Exclusive(doubleTap, singleTap);
   }, [doubleTap, singleTap]);
@@ -117,7 +126,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   posterFallback: { color: "#aaa", fontWeight: "700" },
-
   movieTitle: { marginTop: 6, fontSize: 12 },
 
   heart: {
